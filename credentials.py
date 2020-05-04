@@ -24,6 +24,6 @@ auth.set_access_token("3500144893-zpXqTRLyBAEmClgbC1RUDGX1ggyQ901a4OTHVUr","GaVh
 api = tweepy.API(auth, wait_on_rate_limit =True, wait_on_rate_limit_notify=True)
 tweets_listener = MyStreamListener()
 stream = tweepy.Stream(api.auth, tweets_listener)
-stream.filter(coordinates = 34.052235,-118.243683)
+stream.filter(track = ["Covid-19"])
 
 
