@@ -15,13 +15,16 @@ class MyStreamListener(tweepy.StreamListener):
 		self.cntr = 1
 
 	def create(self,tweet):
-		while (self.cntr < 200):
-			with open(f'{self.cntr}.json', 'a') as json_file:  # cntr becomes new file name ?3
-				if (os.stat(data.json).st_size < self.max_file_size):
+		cntr = 1
+		max_file_size = 10000
+		while (cntr < 10):
+			with open(f'{cntr}.json', 'a') as json_file:  # cntr becomes new file name ?3
+				if (os.stat(f'{cntr}.json').st_size < max_file_size):
 					json_file.write(tweet.text)
 					json_file.write('\n')
+				# on_status(tweet)
 				else:
-					self.cntr = self.cntr + 1
+					cntr = cntr + 1
 
 
 	def on_status(self,tweet):
