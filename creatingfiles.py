@@ -2,42 +2,44 @@
 
 import tweepy
 import json
-import os,sys
 import time
-#import io	#gives backward compatibility with python 2 (NOT NEEDED)
-# from tweepy.streaming import StreamListener
-# from tweepy import OAuthHandler
-# from tweepy import Stream
-
+import threading
+import copy
 
 #heads up: this takes a long time if your gonna do the full 2GB, it already takes a long time just for 5KB
-
-
-#this is for one file size, we need separate files of 10MB all adding up to 2GB
-#for testing it might be faster to make separate files of 1KB up to 5KB
-max_file_size=5000		#Replace this with 2000000000 for 2GB bytes, can use 5000 for 5KB for testing
+max_file_size=5000
 avg_tweet_size=200
 dump_interval_secs=10
-counter = 1
-open('testfile.json', 'w+', encoding="utf-8").close() 	#empties the file and also creates the file if it doesnt exist
 
-# TODO: Add thread-safety
-tweet_data = []
+class TweetData:
+	def __init__(self, filesize=10000000, tweetsize=250):
+		self._tweetsperfile = filesize / tweetsize
+		self._data_lock = threading.Lock()
+		self._file_counter = 1
+		self._data = []
 
-def dump_data(filename):
-	with open(filename, 'w') as f:
-		print(json.dumps(tweet_data), file=f);
-	
+	def __len__(self):
+		return len(self._data)
 
+	def append(self, data):
+		with self._data_lock:
+			self._data.append(data)
+
+	def dump(self):
+		with self._data_lock:
+			tmp = copy.copy(self._data)
+		with open(f'{self._file_counter}.json', 'w') as f:
+			print(json.dumps(tmp), file=f);
+		if (len(tmp) > self._tweetsperfile):
+			self._file_counter += 1;
+			self._data.clear();
+		
 class MyStreamListener(tweepy.StreamListener):
-
-	
-	def _init_(self, e):
-		self.max_file_size = 20
-		self.cntr = 1
+	def set_datastore(self, datastore):
+		self._datastore = datastore
 
 	def on_status(self,tweet):
-		tweet_data.append({
+		self._datastore.append({
 			"user" : tweet.user.name,
 			"text" : tweet.text.replace('\\','\\\\').replace('"','\\"'),
 			"links" : {},
@@ -53,13 +55,10 @@ if __name__ == "__main__":
 						  "GaVhSEpGxctyIY4zBn11tSNJNMt72naUjB1BhNT51iV0V")
 	api = tweepy.API(auth, wait_on_rate_limit=True, wait_on_rate_limit_notify=True)
 	tweets_listener = MyStreamListener(api)
+	tweets_datastore = TweetData(filesize=max_file_size, tweetsize=avg_tweet_size)
+	tweets_listener.set_datastore(tweets_datastore)
 	stream = tweepy.Stream(api.auth, tweets_listener)
 	stream.filter(locations=[-119.859391, 33.013882, -115.904313, 34.884276], async=True)
 	while 1:
-		print(f"Dumping data into file number {counter}...");
-		dump_data(f"{counter}.json");
-		if len(tweet_data) >= max_file_size / avg_tweet_size:
-			counter += 1;
-			tweet_data.clear();
-			
+		tweets_datastore.dump();
 		time.sleep(dump_interval_secs);
