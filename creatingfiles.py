@@ -48,7 +48,7 @@ class MyStreamListener(tweepy.StreamListener):
 		if(os.stat('testfile.json').st_size >= MAX_FILE_SIZE):
 			exit()
 		#print("print st_size = " + str(os.stat('testfile.json').st_size))
-		print(tweet.text)
+		#print(tweet.text)		#uncomment this if you want to see the tweets being printed out
 		json_file = io.open('testfile.json', 'a', encoding="utf-8") 
 		json_file.write(tweet.text)
 		json_file.write('\n')
