@@ -11,6 +11,9 @@ import io	#gives backward compatibility with python 2
 
 #heads up: this takes a long time if your gonna do the full 2GB, it already takes a long time just for 5KB
 
+
+#this is for one file size, we need separate files of 10MB all adding up to 2GB
+#for testing it might be faster to make separate files of 1KB up to 5KB
 MAX_FILE_SIZE = 5000		#Replace this with 2000000000 for 2GB bytes, can use 5000 for 5KB for testing
 counter = 0
 io.open('testfile.json', 'w+', encoding="utf-8").close() 	#empties the file and also creates the file if it doesnt exist
