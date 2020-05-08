@@ -1,0 +1,21 @@
+[
+  {
+    "user" : "john_smith",
+    "text" : "the quick brown fox jumps over the lazy dog",
+    "links" : {
+      "url" : "http://example.com",
+      "title" : "Example"
+    },
+    "location" : [
+      -119.859391, 33.013882
+    ]
+  },
+  {
+    "user" : "twitter_user",
+    "text" : "Hello world!",
+    "links" : {},
+    "location" : [
+      -115.904313, 34.884276
+    ]
+  }
+]

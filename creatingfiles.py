@@ -2,72 +2,52 @@
 
 import tweepy
 import json
-import os,sys
-import io	#gives backward compatibility with python 2
-# from tweepy.streaming import StreamListener
-# from tweepy import OAuthHandler
-# from tweepy import Stream
-
+import time
+import threading
+import copy
 
 #heads up: this takes a long time if your gonna do the full 2GB, it already takes a long time just for 5KB
+max_file_size=5000
+avg_tweet_size=200
+dump_interval_secs=10
 
+class TweetData:
+	def __init__(self, filesize=10000000, tweetsize=250):
+		self._tweetsperfile = filesize / tweetsize
+		self._data_lock = threading.Lock()
+		self._file_counter = 1
+		self._data = []
 
-#this is for one file size, we need separate files of 10MB all adding up to 2GB
-#for testing it might be faster to make separate files of 1KB up to 5KB
-MAX_FILE_SIZE = 5000		#Replace this with 2000000000 for 2GB bytes, can use 5000 for 5KB for testing
-counter = 0
-io.open('testfile.json', 'w+', encoding="utf-8").close() 	#empties the file and also creates the file if it doesnt exist
+	def __len__(self):
+		return len(self._data)
 
+	def append(self, data):
+		with self._data_lock:
+			self._data.append(data)
+
+	def dump(self):
+		with self._data_lock:
+			tmp = copy.copy(self._data)
+		with open(f'{self._file_counter}.json', 'w') as f:
+			print(json.dumps(tmp), file=f);
+		if (len(tmp) > self._tweetsperfile):
+			self._file_counter += 1;
+			self._data.clear();
+		
 class MyStreamListener(tweepy.StreamListener):
-
-	
-	def _init_(self, e):
-		self.max_file_size = 20
-		self.cntr = 1
-		#io.open('testfile.json', 'w+', encoding="utf-8").close() 	#empties the file and also creates the file if it doesnt exist
-
-	# def create(self,tweet):
-	# 	cntr = 0
-	# 	max_file_size = 10000
-	# 	json_file = io.open('testfile.json', 'w+', encoding="utf-8") 
-	# 	while (cntr < 10):
-	# 		if (os.stat('testfile.json').st_size < max_file_size):
-	# 			json_file.write(tweet.text)
-	# 			json_file.write('\n')
-	# 			#self.create(tweet)
-	# 		else:
-	# 			cntr = cntr + 1
-	# 	json_file.close()
-
-	# def create(self,tweet):
-	# 	max_file_size = 10
-	# 	json_file = io.open('testfile.json', 'a', encoding="utf-8") 
-	# 	while (os.stat('testfile.json').st_size < max_file_size):
-	# 		json_file.write(tweet)
-	# 		json_file.write('\n')
-	# 	json_file.close()
-
-
-		#this prints to screen
-		#note: os.stat('testfile.json').st_size is in bytes 2GB = 2e+9 bytes
-
-		#-------------make separate files not all in one file-----------------
+	def set_datastore(self, datastore):
+		self._datastore = datastore
 
 	def on_status(self,tweet):
-		if(os.stat('testfile.json').st_size >= MAX_FILE_SIZE):
-			exit()
-		#print("print st_size = " + str(os.stat('testfile.json').st_size))
-		#print(tweet.text)		#uncomment this if you want to see the tweets being printed out
-		json_file = io.open('testfile.json', 'a', encoding="utf-8") 
-		json_file.write(tweet.text)
-		json_file.write('\n')
-		json_file.close()
-		#print(f"{tweet.user.name}:{tweet.text}")1
-		#self.create(tweet.text)
+		self._datastore.append({
+			"user" : tweet.user.name,
+			"text" : tweet.text.replace('\\','\\\\').replace('"','\\"'),
+			"links" : {},
+			"location" : [] });
 		return True
 
 	def on_error(self, status):
-		print(status)
+		print("Error:{status}")
 
 if __name__ == "__main__":
 	auth = tweepy.OAuthHandler("E0b6PlhPOGqJtqeKTRda74SLS", "3iLsGyLf95lQPFbzWGDhjLtLuGBO5CG2TEMhniqwFrqsFJBXMe")
@@ -75,8 +55,10 @@ if __name__ == "__main__":
 						  "GaVhSEpGxctyIY4zBn11tSNJNMt72naUjB1BhNT51iV0V")
 	api = tweepy.API(auth, wait_on_rate_limit=True, wait_on_rate_limit_notify=True)
 	tweets_listener = MyStreamListener(api)
+	tweets_datastore = TweetData(filesize=max_file_size, tweetsize=avg_tweet_size)
+	tweets_listener.set_datastore(tweets_datastore)
 	stream = tweepy.Stream(api.auth, tweets_listener)
-	stream.filter(locations=[-119.859391, 33.013882, -115.904313, 34.884276])
-
-	#instance = MyStreamListener()
-	#instance.on_status()
+	stream.filter(locations=[-119.859391, 33.013882, -115.904313, 34.884276], async=True)
+	while 1:
+		tweets_datastore.dump();
+		time.sleep(dump_interval_secs);
