@@ -50,6 +50,9 @@ class MyStreamListener(tweepy.StreamListener):
 
 		#this prints to screen
 		#note: os.stat('testfile.json').st_size is in bytes 2GB = 2e+9 bytes
+
+		#-------------make separate files not all in one file-----------------
+
 	def on_status(self,tweet):
 		if(os.stat('testfile.json').st_size >= MAX_FILE_SIZE):
 			exit()
