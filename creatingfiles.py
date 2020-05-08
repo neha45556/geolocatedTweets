@@ -2,36 +2,59 @@
 
 import tweepy
 import json
-# import os,sys
+import os,sys
+import io	#gives backward compatibility with python 2
 # from tweepy.streaming import StreamListener
 # from tweepy import OAuthHandler
 # from tweepy import Stream
 
+MAX_FILE_SIZE = 5000		#value: 2000000000   should be 2GB in bytes, can use 5000 for 5KB for testing
+counter = 0
+io.open('testfile.json', 'w+', encoding="utf-8").close() 	#empties the file and also creates the file if it doesnt exist
 
 class MyStreamListener(tweepy.StreamListener):
 
+	
 	def _init_(self, e):
-		self.max_file_size = 10000000
+		self.max_file_size = 20
 		self.cntr = 1
+		#io.open('testfile.json', 'w+', encoding="utf-8").close() 	#empties the file and also creates the file if it doesnt exist
 
-	def create(self,tweet):
-		cntr = 1
-		max_file_size = 10000
-		while (cntr < 10):
-			with open(f'{cntr}.json', 'a') as json_file:  # cntr becomes new file name ?3
-				if (os.stat(f'{cntr}.json').st_size < max_file_size):
-					json_file.write(tweet.text)
-					json_file.write('\n')
-				# on_status(tweet)
-				else:
-					cntr = cntr + 1
+	# def create(self,tweet):
+	# 	cntr = 0
+	# 	max_file_size = 10000
+	# 	json_file = io.open('testfile.json', 'w+', encoding="utf-8") 
+	# 	while (cntr < 10):
+	# 		if (os.stat('testfile.json').st_size < max_file_size):
+	# 			json_file.write(tweet.text)
+	# 			json_file.write('\n')
+	# 			#self.create(tweet)
+	# 		else:
+	# 			cntr = cntr + 1
+	# 	json_file.close()
+
+	# def create(self,tweet):
+	# 	max_file_size = 10
+	# 	json_file = io.open('testfile.json', 'a', encoding="utf-8") 
+	# 	while (os.stat('testfile.json').st_size < max_file_size):
+	# 		json_file.write(tweet)
+	# 		json_file.write('\n')
+	# 	json_file.close()
 
 
+		#this prints to screen
+		#note: os.stat('testfile.json').st_size is in bytes 2GB = 2e+9 bytes
 	def on_status(self,tweet):
+		if(os.stat('testfile.json').st_size >= MAX_FILE_SIZE):
+			exit()
+		#print("print st_size = " + str(os.stat('testfile.json').st_size))
 		print(tweet.text)
+		json_file = io.open('testfile.json', 'a', encoding="utf-8") 
+		json_file.write(tweet.text)
+		json_file.write('\n')
+		json_file.close()
 		#print(f"{tweet.user.name}:{tweet.text}")1
-		self.create(tweet)
-
+		#self.create(tweet.text)
 		return True
 
 	def on_error(self, status):
@@ -47,4 +70,4 @@ if __name__ == "__main__":
 	stream.filter(locations=[-119.859391, 33.013882, -115.904313, 34.884276])
 
 	#instance = MyStreamListener()
-	# instance.on_status()
+	#instance.on_status()
