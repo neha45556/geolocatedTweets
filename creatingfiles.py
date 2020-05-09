@@ -1,3 +1,5 @@
+#!/usr/bin/env python3
+
 import tweepy
 import json
 import time
@@ -122,7 +124,7 @@ class MyStreamListener(tweepy.StreamListener):
 		self._datastore = datastore
 
 	def on_status(self,tweet):
-		print(f"Recv tweet: {tweet.text[:12]}...")
+		#print(f"Recv tweet: {tweet.text[:12]}...")
 		self._datastore.append({
 			"user" : tweet.user.name or '',
 			"text" : tweet.text or '',
