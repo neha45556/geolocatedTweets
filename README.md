@@ -15,7 +15,7 @@ page title of URLs in the Tweet body.
 The data is broken up into multiple JSON files of configurable size for easy parsing.
 
 ## Required packages
-* Python 3.5+
+* Python 3.6+ (for f-strings)
 * Python Tweepy 3.5+
 * Python lxml
 * Python requests 2.18+
