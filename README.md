@@ -14,6 +14,12 @@ page title of URLs in the Tweet body.
 
 The data is broken up into multiple JSON files of configurable size for easy parsing.
 
+## Required packages
+* Python 3.5+
+* Python Tweepy 3.5+
+* Python lxml
+* Python requests 2.18+
+
 ## Architecture
 The Engine consists of 2 threads: a streaming thread, and a serializing/parsing thread.
 The streaming thread maintains a connection to Twitter's Streaming API, and inserts
