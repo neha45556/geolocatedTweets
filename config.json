@@ -1,0 +1,10 @@
+{
+    "desired file size (bytes)" : 10000000,
+    "estimated size of tweet (bytes)" : 400,
+    "number of tweets per file (if non-zero, filesize and tweet size are ignored)" : 0,
+    "interval to flush data to disk (seconds)" : 10,
+    "bounding boxes to track" : [
+        -119.859391, 33.013882, -115.904313, 34.884276,
+        -3.78,51.24,0.76,53.03
+    ]
+}

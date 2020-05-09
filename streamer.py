@@ -18,6 +18,8 @@ import urlre
 max_file_size=5000
 # Average tweet size in bytes.
 avg_tweet_size=200
+# Tweets per file; if nonzero, above 2 options are ignored.
+tweets_per_file=0
 # Interval to write data to disk.
 dump_interval_secs=10
 
@@ -55,6 +57,8 @@ def crawl_url(url):
 #
 # Paramters: filesize (desired file size in bytes),
 #            tweetsize (estimated storage size per tweet, in bytes)
+#            tweetsperfile (number of tweets per file; overrides filesize and 
+#                          tweetsize if nonzero)
 #
 # Functions:
 #            append: Queue data for parsing and crawling.
@@ -65,8 +69,8 @@ def crawl_url(url):
 #
 #            dump: Save data to disk parsed by `parse`.
 class TweetData:
-	def __init__(self, filesize=10000000, tweetsize=250):
-		self._tweetsperfile = filesize / tweetsize
+	def __init__(self, filesize=10000000, tweetsize=450, tweetsperfile=0):
+		self._tweetsperfile = tweetsperfile or (filesize / tweetsize)
 		self._unparsed_data_lock = threading.Lock()
 		self._parsed_data_lock = threading.Lock()
 		self._file_counter = 1
@@ -140,22 +144,32 @@ class MyStreamListener(tweepy.StreamListener):
 		print("Error:{status}")
 
 if __name__ == "__main__":
+	conf = None
+	locations_to_track = [-119.859391, 33.013882, -115.904313, 34.884276]
+	with open('config.json', 'r') as conf_raw:
+		conf = json.load(conf_raw)
+		max_file_size = conf["desired file size (bytes)"]
+		avg_tweet_size = conf["estimated size of tweet (bytes)"]
+		tweets_per_file = conf["number of tweets per file (if non-zero, filesize and tweet size are ignored)"]
+		dump_interval_secs = conf["interval to flush data to disk (seconds)"]
+		locations_to_track = conf["bounding boxes to track"]
+		
 	auth = tweepy.OAuthHandler("E0b6PlhPOGqJtqeKTRda74SLS", "3iLsGyLf95lQPFbzWGDhjLtLuGBO5CG2TEMhniqwFrqsFJBXMe")
 	auth.set_access_token("3500144893-zpXqTRLyBAEmClgbC1RUDGX1ggyQ901a4OTHVUr",
 						  "GaVhSEpGxctyIY4zBn11tSNJNMt72naUjB1BhNT51iV0V")
 	api = tweepy.API(auth, wait_on_rate_limit=True, wait_on_rate_limit_notify=True)
 	tweets_listener = MyStreamListener(api)
-	tweets_datastore = TweetData(filesize=max_file_size, tweetsize=avg_tweet_size)
+	tweets_datastore = TweetData(filesize=max_file_size, tweetsize=avg_tweet_size, tweetsperfile=tweets_per_file)
 	tweets_listener.set_datastore(tweets_datastore)
 	stream = tweepy.Stream(api.auth, tweets_listener)
 
 	# TODO: pick version to use more smartly. This is jank af.
 	try:
 		print(f"Tweepy version {tweepy.__version__}");
-		stream.filter(locations=[-119.859391, 33.013882, -115.904313, 34.884276], async=True)
+		stream.filter(locations=locations_to_track, async=True)
 	except TypeError:
 		print(f"Tweepy version {tweepy.__version__}, falling back to `is_async`");
-		stream.filter(locations=[-119.859391, 33.013882, -115.904313, 34.884276], is_async=True)
+		stream.filter(locations=locations_to_track, is_async=True)
 
 	while 1:
 		try:
