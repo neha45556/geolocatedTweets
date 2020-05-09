@@ -2,8 +2,8 @@
 Prepared by: Daniel Ma (dma012@ucr.edu), Jeremy Taraba (jtara006@ucr.edu), Neha Gupta (ngupt009@ucr.edu)
 
 ## Collaboration Details
-* Daniel: JSON schema, data serialization, URL crawling, concurrency.
-* Neha: Creating Twitter API credentials, creating files and outputing data, Memory Management
+* Daniel: JSON data formatting, URL crawling, concurrency issues.
+* Neha: Twitter API setup and abstraction, creating files and output data, Memory Management
 * Jeremy: 
 
 ## Overview
