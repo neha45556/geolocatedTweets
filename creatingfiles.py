@@ -75,9 +75,16 @@ class TweetData:
 
 	def append(self, data):
 		print("append: " + str(len(self._unparsed_data)))
+		# TODO: Pick overflow number at runtime.
 		with self._data_lock:
+			if len(self._unparsed_data) > 250:
+				print("Warning: Parsing/crawling is falling behind!");
+				print(f"Warning: Skipping parsing of {len(self._unparsed_data)} entries.");
+				self._data.extend(self._unparsed_data)
+				self._unparsed_data.clear()
 			self._unparsed_data.append(data)
 
+	# TODO: This may no longer be thread safe.
 	def parse(self):
 		pos = len(self._data)
 		with self._data_lock:
@@ -127,7 +134,13 @@ if __name__ == "__main__":
 	tweets_datastore = TweetData(filesize=max_file_size, tweetsize=avg_tweet_size)
 	tweets_listener.set_datastore(tweets_datastore)
 	stream = tweepy.Stream(api.auth, tweets_listener)
-	stream.filter(locations=[-119.859391, 33.013882, -115.904313, 34.884276], async=True)
+
+	try:
+		print(f"Tweepy version {tweepy.__version__}");
+		stream.filter(locations=[-119.859391, 33.013882, -115.904313, 34.884276], async=True)
+	except TypeError:
+		print(f"Tweepy version {tweepy.__version__}, falling back to `is_async`");
+		stream.filter(locations=[-119.859391, 33.013882, -115.904313, 34.884276], is_async=True)
 
 	while 1:
 		try:
