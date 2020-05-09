@@ -3,7 +3,7 @@ Prepared by: Daniel Ma (dma012@ucr.edu), Jeremy Taraba (jtara006@ucr.edu), Neha 
 
 ## Collaboration Details
 * Daniel: JSON schema, data serialization, URL crawling, concurrency.
-* Neha: 
+* Neha: Creating Twitter API credentials, creating files and outputing data, Memory Management
 * Jeremy: 
 
 ## Overview
@@ -15,7 +15,7 @@ page title of URLs in the Tweet body.
 The data is broken up into multiple JSON files of configurable size for easy parsing.
 
 ## Required packages
-* Python 3.5+
+* Python 3.6+ (for f-strings)
 * Python Tweepy 3.5+
 * Python lxml
 * Python requests 2.18+
