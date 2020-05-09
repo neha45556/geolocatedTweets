@@ -14,6 +14,13 @@ page title of URLs in the Tweet body.
 
 The data is broken up into multiple JSON files of configurable size for easy parsing.
 
+## Architecture
+The Engine consists of 2 threads: a streaming thread, and a serializing/parsing thread.
+The streaming thread maintains a connection to Twitter's Streaming API, and inserts
+data into a queue for parsing or saving. The serializing thread parses data from this
+queue, and attempts to crawl any URLs found in the tweet body. The serializing thread
+also occasionally writes the data to disk in a series of large JSON files.
+
 ## Data collection
 The Engine maintains a connection to the Twitter Streaming API that queues data for 
 parsing and saving. Data is queued in a Python dictionary, which has a format that
@@ -34,5 +41,24 @@ configurable intervals.  The data can be broken up into multiple files.  The bre
 can be configured, but are not very precise; file size can vary up to 20% from the desired
 file size, depending on provided parameters.
 
-## Data structures
+## Limitations
+Most Tweets do not come with exact location data, or any location data at all.  This is
+because most Twitter users choose not to provide this data to Twitter.
 
+On some systems or networks, fetching a URL can be extremely slow.  This can be a bottleneck
+in the parsing process.  If parsing falls behind the Twitter stream, many tweets that contain
+URLs will not contain metadata for those URLs.  This limitation can be circumvented by using
+Twitter's built-in API for digesting Tweet URLs, rather than manually crawling these URLs on 
+the application side.
+
+## Usage instructions
+
+Start with `./crawler.sh`.  Configuration options can be adjusted in `config.json`. The
+configuration options are generally self-explanatory, but must be written in valid JSON.
+
+The last configuration option ("bounding boxes to track") is a list of pairs of longitude/latitude
+coordinates. Each pair of coordinates specifies a bounding box from which to collect Tweets, with 
+the southwest coordinates specified first.
+
+## Screenshots
+ 
