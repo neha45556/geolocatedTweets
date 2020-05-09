@@ -11,10 +11,20 @@ import sys
 import urlre
 
 #heads up: this takes a long time if your gonna do the full 2GB, it already takes a long time just for 5KB
+
+# Desired file size in bytes.
 max_file_size=5000
+# Average tweet size in bytes.
 avg_tweet_size=200
+# Interval to write data to disk.
 dump_interval_secs=10
 
+##
+# Function crawl_url
+#
+# Parameters: url (string) (URL to visit)
+# Returns: Tuple(url, title of page)
+# Returns none if page does not exist, errors, or is not HTML text.
 def crawl_url(url):
 	retdata = {}
 	try:
@@ -35,6 +45,23 @@ def crawl_url(url):
 
 	return retdata or None
 
+##
+# Class TweetData
+#
+# Queues data from a Twitter stream, parses it, and saves it
+# to disk. Thread-safe.
+#
+# Paramters: filesize (desired file size in bytes),
+#            tweetsize (estimated storage size per tweet, in bytes)
+#
+# Functions:
+#            append: Queue data for parsing and crawling.
+#                    Takes a dictionary with keys user (string),
+#                    text (string), links (empty array), location (array).
+#
+#            parse: Parse all data queued by `append`.
+#
+#            dump: Save data to disk parsed by `parse`.
 class TweetData:
 	def __init__(self, filesize=10000000, tweetsize=250):
 		self._tweetsperfile = filesize / tweetsize
