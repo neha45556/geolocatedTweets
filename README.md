@@ -3,7 +3,7 @@ Prepared by: Daniel Ma (dma012@ucr.edu), Jeremy Taraba (jtara006@ucr.edu), Neha 
 
 ## Collaboration Details
 * Daniel: JSON schema, data serialization, URL crawling, concurrency.
-* Neha: 
+* Neha: Creating Twitter API credentials, creating files and outputing data, Memory Management
 * Jeremy: 
 
 ## Overview
