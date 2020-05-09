@@ -65,7 +65,8 @@ def crawl_url(url):
 class TweetData:
 	def __init__(self, filesize=10000000, tweetsize=250):
 		self._tweetsperfile = filesize / tweetsize
-		self._data_lock = threading.Lock()
+		self._unparsed_data_lock = threading.Lock()
+		self._parsed_data_lock = threading.Lock()
 		self._file_counter = 1
 		self._unparsed_data = []
 		self._data = []
@@ -76,38 +77,45 @@ class TweetData:
 	def append(self, data):
 		print("append: " + str(len(self._unparsed_data)))
 		# TODO: Pick overflow number at runtime.
-		with self._data_lock:
+		needs_flush = False;
+		with self._unparsed_data_lock:
 			if len(self._unparsed_data) > 250:
 				print("Warning: Parsing/crawling is falling behind!");
 				print(f"Warning: Skipping parsing of {len(self._unparsed_data)} entries.");
+				needs_flush = True
+			self._unparsed_data.append(data)
+		if needs_flush:
+			with self._parsed_data_lock:
 				self._data.extend(self._unparsed_data)
 				self._unparsed_data.clear()
-			self._unparsed_data.append(data)
 
-	# TODO: This may no longer be thread safe.
 	def parse(self):
 		pos = len(self._data)
-		with self._data_lock:
-			self._data.extend(self._unparsed_data)
+		parse_buffer = []
+		with self._unparsed_data_lock:
+			parse_buffer.extend(self._unparsed_data)
 			self._unparsed_data.clear()
 			print("parse: " + str(len(self._data)))
-		for i in range(pos, len(self._data)):
+		for i in range(len(parse_buffer)):
 			# Parse for URLs here
-			url_matches = re.findall(urlre.url, self._data[i]['text'])
+			url_matches = re.findall(urlre.url, parse_buffer[i]['text'])
 			for url in url_matches:
 				crawled_data = crawl_url(url)
 				if crawled_data:
-					self._data[i]['links'].append(crawl_url(url))
+					parse_buffer[i]['links'].append(crawl_url(url))
+		if parse_buffer:
+			with self._parsed_data_lock:
+				self._data.extend(parse_buffer)
 
 	def dump(self):
 		self.parse()
-		#tmp = copy.copy(self._data)
-		tmp = self._data
+		with self._parsed_data_lock:
+			tmp = copy.deepcopy(self._data)
+			if (len(tmp) > self._tweetsperfile):
+				self._file_counter += 1
+				self._data.clear()
 		with open(f'{self._file_counter}.json', 'w') as f:
 			print(json.dumps(tmp), file=f)
-		if (len(tmp) > self._tweetsperfile):
-			self._file_counter += 1
-			self._data.clear()
 
 class MyStreamListener(tweepy.StreamListener):
 	def set_datastore(self, datastore):
