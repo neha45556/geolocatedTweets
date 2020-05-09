@@ -42,7 +42,7 @@ class MyStreamListener(tweepy.StreamListener):
 		self._datastore.append({
 			"user" : tweet.user.name,
 			"text" : tweet.text.replace('\\','\\\\').replace('"','\\"'),
-			"links" : {},
+			"links" : [],
 			"location" : [] });
 		return True
 
