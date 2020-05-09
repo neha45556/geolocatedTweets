@@ -109,6 +109,7 @@ class TweetData:
 			with self._parsed_data_lock:
 				self._data.extend(parse_buffer)
 
+	# TODO: Run parser asynchronously.
 	def dump(self):
 		self.parse()
 		cnt = self._file_counter
@@ -131,7 +132,8 @@ class MyStreamListener(tweepy.StreamListener):
 			"user" : tweet.user.name or '',
 			"text" : tweet.text or '',
 			"links" : [],
-			"location" : [] })
+			"location" : dict(tweet.coordinates or {})
+			})
 		return True
 
 	def on_error(self, status):
@@ -147,6 +149,7 @@ if __name__ == "__main__":
 	tweets_listener.set_datastore(tweets_datastore)
 	stream = tweepy.Stream(api.auth, tweets_listener)
 
+	# TODO: pick version to use more smartly. This is jank af.
 	try:
 		print(f"Tweepy version {tweepy.__version__}");
 		stream.filter(locations=[-119.859391, 33.013882, -115.904313, 34.884276], async=True)
