@@ -78,10 +78,10 @@ class TweetData:
 
 	def append(self, data):
 		print("append: " + str(len(self._unparsed_data)))
-		# TODO: Pick overflow number at runtime.
+		# TODO: Pick overflow number more smartly.
 		needs_flush = False;
 		with self._unparsed_data_lock:
-			if len(self._unparsed_data) > 250:
+			if len(self._unparsed_data) > self._tweetsperfile:
 				print("Warning: Parsing/crawling is falling behind!");
 				print(f"Warning: Skipping parsing of {len(self._unparsed_data)} entries.");
 				needs_flush = True
@@ -111,12 +111,14 @@ class TweetData:
 
 	def dump(self):
 		self.parse()
+		cnt = self._file_counter
 		with self._parsed_data_lock:
-			tmp = copy.deepcopy(self._data)
+			tmp = []
+			tmp.extend(self._data)
 			if (len(tmp) > self._tweetsperfile):
 				self._file_counter += 1
 				self._data.clear()
-		with open(f'{self._file_counter}.json', 'w') as f:
+		with open(f'{cnt}.json', 'w') as f:
 			print(json.dumps(tmp), file=f)
 
 class MyStreamListener(tweepy.StreamListener):
