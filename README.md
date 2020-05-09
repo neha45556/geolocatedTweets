@@ -67,4 +67,15 @@ coordinates. Each pair of coordinates specifies a bounding box from which to col
 the southwest coordinates specified first.
 
 ## Screenshots
- 
+
+![JSON output alongside command running and configuration options][cap1]
+![JSON output alongside command running and configuration options][cap2]
+![JSON output alongside command running and configuration options][cap3]
+![JSON output alongside command running and configuration options][cap4]
+![Non-testing config options][cap5]
+
+[cap1]: https://github.com/neha45556/geolocatedTweets/raw/master/images/1.png
+[cap2]: https://github.com/neha45556/geolocatedTweets/raw/master/images/2.png
+[cap3]: https://github.com/neha45556/geolocatedTweets/raw/master/images/3.png
+[cap4]: https://github.com/neha45556/geolocatedTweets/raw/master/images/4.png
+[cap5]: https://github.com/neha45556/geolocatedTweets/raw/master/images/5.png
