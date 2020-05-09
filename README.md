@@ -68,10 +68,15 @@ the southwest coordinates specified first.
 
 ## Screenshots
 
+### JSON output with testing config
 ![JSON output alongside command running and configuration options][cap1]
+### JSON output with testing config 2
 ![JSON output alongside command running and configuration options][cap2]
+### JSON output with testing config 3
 ![JSON output alongside command running and configuration options][cap3]
+### File size variation with testing config
 ![JSON output alongside command running and configuration options][cap4]
+### Program output with "production" config
 ![Non-testing config options][cap5]
 
 [cap1]: https://github.com/neha45556/geolocatedTweets/raw/master/images/1.png
