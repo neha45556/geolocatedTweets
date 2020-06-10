@@ -11,6 +11,7 @@ import lxml.html
 import sys
 import os
 
+import queue
 #heads up: this takes a long time if your gonna do the full 2GB, it already takes a long time just for 5KB
 
 # Data directory.
@@ -87,55 +88,56 @@ class TweetData:
 					self._file_counter = matchnum + 1
 
 		print(f'Starting at file {self._file_counter}')
-		self._tweetsperfile = tweetsperfile or (filesize / tweetsize)
-		self._unparsed_data_lock = threading.Lock()
+		self._tweets_per_file = tweetsperfile or (filesize / tweetsize)
 		self._parsed_data_lock = threading.Lock()
-		self._unparsed_data = []
+		self._unparsed_data = queue.Queue(maxsize=self._tweets_per_file)
 		self._data = []
+		self._thread_count = 16
+		self._threads = []
+
+		for i in range(self._thread_count):
+			t = threading.Thread(target=self.parse)
+			t.daemon = True
+			t.start()
+			self._threads.append(t)
+			
+		print(f'Spawned {len(self._threads)} getter threads')
 
 	def __len__(self):
 		return len(self._data)
 
 	def append(self, data):
-		print("append: " + str(len(self._unparsed_data)))
-		# TODO: Pick overflow number more smartly.
-		needs_flush = False;
-		with self._unparsed_data_lock:
-			if len(self._unparsed_data) > self._tweetsperfile:
-				print("Warning: Parsing/crawling is falling behind!");
-				print(f"Warning: Skipping parsing of {len(self._unparsed_data)} entries.");
-				needs_flush = True
-			self._unparsed_data.append(data)
-		if needs_flush:
-			with self._parsed_data_lock:
-				self._data.extend(self._unparsed_data)
-				self._unparsed_data.clear()
+		print("queue size: " + str(_unparsed_data.qsize())))
+		if len(data['links']) > 0: # Only queue items that have urls to get.
+			try:
+				self._unparsed_data.put_nowait(data)
+			except queue.Full:
+				with self._parsed_data_lock:
+					print("Warning: queue is full; skipping 1 entry.");
+					self._data.append(data);
+		else:
+			self._data.append(data);
 
 	def parse(self):
-		pos = len(self._data)
-		parse_buffer = []
-		with self._unparsed_data_lock:
-			parse_buffer.extend(self._unparsed_data)
-			self._unparsed_data.clear()
-			print("parse: " + str(len(self._data)))
-		for entry in parse_buffer:
+		worker_has_work = True;
+		while worker_has_work:
+			entry = self._unparsed_data.get()
 			# Parse for URLs here
 			for link in entry['links']:
 				page_title = crawl_url(link['url'])
 				if page_title:
-					link['title'] = page_title;
-		if parse_buffer:
+					link['title'] = page_title
 			with self._parsed_data_lock:
-				self._data.extend(parse_buffer)
+				self._data.append(entry)
+			self._unparsed_data.task_done()
 
 	# TODO: Run parser asynchronously.
 	def dump(self):
-		self.parse()
 		cnt = self._file_counter
 		with self._parsed_data_lock:
 			tmp = []
 			tmp.extend(self._data)
-			if (len(tmp) > self._tweetsperfile):
+			if (len(tmp) > self._tweets_per_file):
 				self._file_counter += 1
 				self._data.clear()
 		with open(f'{data_directory}/{cnt}.json', 'w') as f:
