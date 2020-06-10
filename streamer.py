@@ -9,11 +9,12 @@ import re
 import requests
 import lxml.html
 import sys
-
-import urlre
+import os
 
 #heads up: this takes a long time if your gonna do the full 2GB, it already takes a long time just for 5KB
 
+# Data directory.
+data_directory='data'
 # Desired file size in bytes.
 max_file_size=5000
 # Average tweet size in bytes.
@@ -27,10 +28,10 @@ dump_interval_secs=10
 # Function crawl_url
 #
 # Parameters: url (string) (URL to visit)
-# Returns: Tuple(url, title of page)
+# Returns: title of page (string)
 # Returns none if page does not exist, errors, or is not HTML text.
 def crawl_url(url):
-	retdata = {}
+	retdata = None
 	try:
 		r = requests.get(url)
 		if r.status_code != 200: # HTTP OK
@@ -39,9 +40,7 @@ def crawl_url(url):
 			raise requests.exceptions.RequestException('Non-HTML data')
 
 		tree = lxml.html.fromstring(r.content)
-		title = tree.findtext('.//title')
-		if title:
-			retdata = { 'url' : r.url, 'title' : title }
+		retdata = tree.findtext('.//title')
 	except requests.exceptions.RequestException:
 		return None
 	except lxml.etree.XMLSyntaxError:
@@ -69,11 +68,28 @@ def crawl_url(url):
 #
 #            dump: Save data to disk parsed by `parse`.
 class TweetData:
-	def __init__(self, filesize=10000000, tweetsize=450, tweetsperfile=0):
+	def __init__(self, data_directory='.', filesize=10000000, tweetsize=450, tweetsperfile=0):
+		if data_directory != '.':
+			if not os.path.isdir(data_directory):
+				try:
+					os.mkdir(data_directory)
+				except OSError:
+					print("Directory creation failed; make sure it doesn't exist already and you have write permissions to the file system.")
+					sys.exit()
+
+		current_files = os.listdir(data_directory)
+		self._file_counter = 1
+		for filename in current_files:
+			match = re.match(r'^([0-9]+)\.json$', filename)
+			if match:
+				matchnum = int(match.group(1))
+				if self._file_counter <= matchnum:
+					self._file_counter = matchnum + 1
+
+		print(f'Starting at file {self._file_counter}')
 		self._tweetsperfile = tweetsperfile or (filesize / tweetsize)
 		self._unparsed_data_lock = threading.Lock()
 		self._parsed_data_lock = threading.Lock()
-		self._file_counter = 1
 		self._unparsed_data = []
 		self._data = []
 
@@ -102,13 +118,12 @@ class TweetData:
 			parse_buffer.extend(self._unparsed_data)
 			self._unparsed_data.clear()
 			print("parse: " + str(len(self._data)))
-		for i in range(len(parse_buffer)):
+		for entry in parse_buffer:
 			# Parse for URLs here
-			url_matches = re.findall(urlre.url, parse_buffer[i]['text'])
-			for url in url_matches:
-				crawled_data = crawl_url(url)
-				if crawled_data:
-					parse_buffer[i]['links'].append(crawl_url(url))
+			for link in entry['links']:
+				page_title = crawl_url(link['url'])
+				if page_title:
+					link['title'] = page_title;
 		if parse_buffer:
 			with self._parsed_data_lock:
 				self._data.extend(parse_buffer)
@@ -123,7 +138,7 @@ class TweetData:
 			if (len(tmp) > self._tweetsperfile):
 				self._file_counter += 1
 				self._data.clear()
-		with open(f'{cnt}.json', 'w') as f:
+		with open(f'{data_directory}/{cnt}.json', 'w') as f:
 			print(json.dumps(tmp), file=f)
 
 class MyStreamListener(tweepy.StreamListener):
@@ -135,7 +150,7 @@ class MyStreamListener(tweepy.StreamListener):
 		self._datastore.append({
 			"user" : tweet.user.name or '',
 			"text" : tweet.text or '',
-			"links" : [],
+			"links" : [{'url' : url['expanded_url'], 'title' : None} for url in tweet.entities['urls']],
 			"location" : dict(tweet.coordinates or {})
 			})
 		return True
@@ -152,14 +167,15 @@ if __name__ == "__main__":
 		avg_tweet_size = conf["estimated size of tweet (bytes)"]
 		tweets_per_file = conf["number of tweets per file (if non-zero, filesize and tweet size are ignored)"]
 		dump_interval_secs = conf["interval to flush data to disk (seconds)"]
-		locations_to_track = conf["bounding boxes to track"]
-		
+		locations_to_track = conf["bounding boxes to track (degrees east, degrees north; southeast, northwest)"]
+		data_directory = conf["data directory"]
+
 	auth = tweepy.OAuthHandler("E0b6PlhPOGqJtqeKTRda74SLS", "3iLsGyLf95lQPFbzWGDhjLtLuGBO5CG2TEMhniqwFrqsFJBXMe")
 	auth.set_access_token("3500144893-zpXqTRLyBAEmClgbC1RUDGX1ggyQ901a4OTHVUr",
 						  "GaVhSEpGxctyIY4zBn11tSNJNMt72naUjB1BhNT51iV0V")
 	api = tweepy.API(auth, wait_on_rate_limit=True, wait_on_rate_limit_notify=True)
 	tweets_listener = MyStreamListener(api)
-	tweets_datastore = TweetData(filesize=max_file_size, tweetsize=avg_tweet_size, tweetsperfile=tweets_per_file)
+	tweets_datastore = TweetData(data_directory=data_directory, filesize=max_file_size, tweetsize=avg_tweet_size, tweetsperfile=tweets_per_file)
 	tweets_listener.set_datastore(tweets_datastore)
 	stream = tweepy.Stream(api.auth, tweets_listener)
 
