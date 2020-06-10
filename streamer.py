@@ -107,7 +107,9 @@ class TweetData:
 		return len(self._data)
 
 	def append(self, data):
-		print("queue size: " + str(_unparsed_data.qsize()))
+		queue_size = self._unparsed_data.qsize()
+		if queue_size > 0:
+			print("queue size: " + str(queue_size))
 		if len(data['links']) > 0: # Only queue items that have urls to get.
 			try:
 				self._unparsed_data.put_nowait(data)
@@ -158,7 +160,7 @@ class MyStreamListener(tweepy.StreamListener):
 		return True
 
 	def on_error(self, status):
-		print("Error:{status}")
+		print(f"Error:{status}")
 
 if __name__ == "__main__":
 	conf = None
