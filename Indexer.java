@@ -50,7 +50,7 @@ public class Indexer {
             Directory dir = FSDirectory.open(indexPath);
             Analyzer analyzer = new StandardAnalyzer();
             IndexWriterConfig iwc = new IndexWriterConfig(analyzer);
-            iwc.setOpenMode(OpenMode.CREATE_OR_APPEND);
+            iwc.setOpenMode(OpenMode.CREATE);
 
             IndexWriter writer = new IndexWriter(dir, iwc);
             indexEntries(writer, dataPath);
@@ -127,7 +127,7 @@ public class Indexer {
          * Tweet text (analyzed).
          */
         doc.add(new TextField("text", entry.text, Field.Store.NO));
-        System.out.println(entry.text);
+        //System.out.println(entry.text);
 
         /**
          * Coordinates.
@@ -154,6 +154,13 @@ public class Indexer {
             doc.add(new LongPoint("date", longdate));
         } catch (Exception e) {
             // Invalid date; do nothing...
+        }
+
+        try {
+            System.out.print(".");
+            writer.addDocument(doc);
+        } catch (Exception e) {
+            System.out.println("Error occurred: " + e.toString());
         }
     }
 }
