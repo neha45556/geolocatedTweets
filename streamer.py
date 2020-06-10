@@ -107,7 +107,7 @@ class TweetData:
 		return len(self._data)
 
 	def append(self, data):
-		print("queue size: " + str(_unparsed_data.qsize())))
+		print("queue size: " + str(_unparsed_data.qsize()))
 		if len(data['links']) > 0: # Only queue items that have urls to get.
 			try:
 				self._unparsed_data.put_nowait(data)
