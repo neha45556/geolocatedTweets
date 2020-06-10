@@ -136,12 +136,13 @@ class TweetData:
 	# TODO: Run parser asynchronously.
 	def dump(self):
 		cnt = self._file_counter
+		tmp = []
 		with self._parsed_data_lock:
-			tmp = []
 			tmp.extend(self._data)
 			if (len(tmp) > self._tweets_per_file):
 				self._file_counter += 1
 				self._data.clear()
+		print(f"dump: {len(tmp)} entries saved, {len(self._data)} entries in memory.")
 		with open(f'{data_directory}/{cnt}.json', 'w') as f:
 			print(json.dumps(tmp), file=f)
 
