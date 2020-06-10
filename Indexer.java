@@ -55,6 +55,7 @@ public class Indexer {
             IndexWriter writer = new IndexWriter(dir, iwc);
             indexEntries(writer, dataPath);
         } catch (Exception e) {
+            System.out.println("main Error");
             System.out.println(e.toString());
         }
         /*
@@ -89,7 +90,11 @@ public class Indexer {
         reader.beginArray();
         while (reader.hasNext()) {
             TweetEntry tweet = gson.fromJson(reader, TweetEntry.class);
-            indexEntry(writer, tweet);
+            try {
+                indexEntry(writer, tweet);
+            } catch (java.lang.NullPointerException e) {
+                System.err.println("Something happened");
+            }
         }
     }
 
@@ -122,12 +127,17 @@ public class Indexer {
          * Tweet text (analyzed).
          */
         doc.add(new TextField("text", entry.text, Field.Store.NO));
+        System.out.println(entry.text);
 
         /**
          * Coordinates.
          */
-        if (entry.location != null && entry.location.coordinates.size() >= 2) {
-            doc.add(new LatLonPoint("location", entry.location.coordinates.get(1), entry.location.coordinates.get(0)));
+        try {
+            if (entry.location.coordinates != null && entry.location.coordinates.size() >= 2) {
+                doc.add(new LatLonPoint("location", entry.location.coordinates.get(1), entry.location.coordinates.get(0)));
+            }
+        } catch (java.lang.NullPointerException e) {
+            System.out.println("Error inserting coordinates...");
         }
 
         /** 

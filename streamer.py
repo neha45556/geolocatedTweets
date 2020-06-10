@@ -156,7 +156,8 @@ class MyStreamListener(tweepy.StreamListener):
 			"user" : tweet.user.name or '',
 			"text" : tweet.text or '',
 			"links" : [{'url' : url['expanded_url'], 'title' : None} for url in tweet.entities['urls']],
-			"location" : dict(tweet.coordinates or {})
+			"location" : dict(tweet.coordinates or {}),
+			"datetime" : str(tweet.created_at or '')
 			})
 		return True
 
