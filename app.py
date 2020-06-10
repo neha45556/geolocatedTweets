@@ -9,7 +9,7 @@ app = Flask(__name__)
 api = Api(app)
 
 
-# this will be filled with the index
+# mock values, this will be filled with the index
 index_values = [
     {
         "user": "Nicholas",
@@ -60,13 +60,14 @@ class index(Resource):
     # The get method is used to retrieve a particular index details by specifying the name:
     # /index/search?term=search_term&page=1&ranking=default returns the first page of 10 results after searching for "search_term" using the default ranking algorithm. 
     # more recent tweets should have higher score
-    # ranking is based on vector space model using tf 
+    # ranking is based on vector space model using tf, probably do difference in minutes * .001
     def get(self, name):
         index_list = []
         for index in index_values:
             tweet_text = set(index["text"].lower().split(' '))
             search_term = set(name.lower().split(' '))
-            if(search_term == tweet_text):
+          
+            if(search_term[0] == tweet_text[0]):
                 index_list.append(index)
 
         if index_list:
