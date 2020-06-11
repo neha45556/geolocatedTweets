@@ -67,6 +67,7 @@ class index(Resource):
             if(denominator != 0):
                 relevance = numerator / denominator
 
+            index_values[i]["rank"] = relevance
             if(relevance > .1):
                 index_list.append(index_values[i])
 
@@ -75,7 +76,13 @@ class index(Resource):
 
         if index_list:  
             # sort and return the top 10 based on ranking   
-            return index_list, 200
+            top_ten = []
+
+            
+            # for it in range(len(index_values)):
+            #     max = index_values[it]["rank"]
+            top_ten = index_list[:10]
+            return top_ten, 200
 
         return "search term not found", 404
 
