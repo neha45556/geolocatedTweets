@@ -75,6 +75,7 @@ public class Indexer {
                 Path currentMaxFile = path.resolve(String.format("%d.json", maxFile));
                 if (Files.isRegularFile(currentMaxFile) && Files.isRegularFile(path.resolve(String.format("%d.json", maxFile+1)))) {
                     try {
+                        System.out.println("Indexing file " + maxFile);
                         InputStream in = Files.newInputStream(currentMaxFile);
                         readJsonStream(in, writer);
                     } catch (Exception e) {
@@ -166,7 +167,7 @@ public class Indexer {
         }
 
         try {
-            System.out.print(".");
+            //System.out.print(".");
             writer.addDocument(doc);
         } catch (Exception e) {
             System.out.println("Error occurred: " + e.toString());
