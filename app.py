@@ -5,6 +5,8 @@
 from flask import Flask
 from flask_restful import Api, Resource, reqparse
 import json
+from collections import Counter
+import math
 
 app = Flask(__name__)
 api = Api(app)
@@ -24,11 +26,52 @@ class index(Resource):
     def get(self, name):
         index_list = []
         for i in range(len(index_values)):
-            tweet_text = set(index_values[i]["text"].split(' '))
-            search_term = set(name.lower().split(' '))
-          
-            if(search_term == tweet_text):
+            tweet_text = list(index_values[i]["text"].lower().split(' '))
+            search_term = list(name.lower().split(' '))
+
+            # counts term frequencies
+            count_tweet = Counter(tweet_text)
+            count_term = Counter(search_term)
+
+            # remove duplicates from text
+            tweet_text = list(dict.fromkeys(tweet_text))
+            search_term = list(dict.fromkeys(search_term))
+            # loop through all the words of biggest list
+            if(len(tweet_text) >= len(search_term)):
+                max_list = tweet_text
+                min_list = search_term
+            else:
+                max_list = search_term
+                min_list = tweet_text
+
+            # calculate numerator for vector space model
+            numerator = 0
+            for k in range(len(max_list)):
+                word = max_list[k]
+                numerator += count_tweet[word] * count_term[word]
+            
+            #calculate denominator for vector space model
+            lhs = 0
+            rhs = 0
+            for j in range(len(tweet_text)):
+                word = tweet_text[j]
+                rhs += pow(count_tweet[word], 2)
+            
+            for x in range(len(search_term)):
+                word = search_term[x]
+                lhs += pow(count_term[word], 2)
+
+            denominator = math.sqrt(rhs*lhs)
+
+            relevance = 0
+            if(denominator != 0):
+                relevance = numerator / denominator
+
+            if(relevance > .1):
                 index_list.append(index_values[i])
+
+
+
 
         if index_list:  
             # sort and return the top 10 based on ranking   
