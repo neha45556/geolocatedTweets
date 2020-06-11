@@ -125,11 +125,11 @@ page title of URLs in the Tweet body.
 The data is broken up into multiple JSON files of configurable size for easy parsing.
 
 ## Architecture
-Used apache and Lucene as well as tested using a REST API server to rank and return the top ten results.
+The Architecture of our system uses Apache and Lucene to generate a working web page and rank the tweets. We also used python scripts and tweepy to collect on the tweets into a folder. We also tested using a REST API server to rank and return the top ten results which we ended up not using.
 
 ## Index Structures
 
-Using Lucene we parsed the incoming tweets based on Username, Tweet text, Links, URL, and Title.
+Using Lucene we parsed the incoming tweets based on Username, Tweet text, Links, URL, Time, and Title. We used chose these elements because it makes it simple to rank the tweets based on text content and time. 
 
 ## Search Algorithm 
 Vector space model with time relevance which decreases the score the more time that pass since the initial search.  We chose this ranking algorithm because it is fairly simple to implement and run on our system.
@@ -149,7 +149,7 @@ Some limitation are not taking into account the URL, links or location that was 
 
 
 ## Instructions on how to deploy the system
-Run ./crawler.sh to procure the data from the tweets then compile the indexer with `./compile_indexer.sh` and run it with `./run_indexer.sh`. This will store the index files in the `index` folder. 
+Run ./crawler.sh to procure the data from the tweets then compile the indexer with `./compile_indexer.sh` and run it with `./run_indexer.sh`. This will store the index files in the `index` folder. Then run streamer.py
     
     
 ## A web-application (e.g. Web Archive) 
