@@ -78,9 +78,11 @@ class index(Resource):
             # sort and return the top 10 based on ranking   
             top_ten = []
 
-            
+            # sorting function right here
             # for it in range(len(index_values)):
             #     max = index_values[it]["rank"]
+
+
             top_ten = index_list[:10]
             return top_ten, 200
 
