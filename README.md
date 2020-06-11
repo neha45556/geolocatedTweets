@@ -4,7 +4,7 @@ Prepared by: Daniel Ma (dma012@ucr.edu), Jeremy Taraba (jtara006@ucr.edu), Neha 
 
 ## Part A: Build a Web Crawler for edu pages, or a geotagged Twitter post collector
 
-## Collaboration Details
+## Collaboration Details PART A
 
 * Daniel: JSON data formatting, URL crawling, concurrency issues.
 * Neha: Twitter API setup and abstraction, creating files and output data, Memory Management
