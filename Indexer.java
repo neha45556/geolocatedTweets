@@ -71,6 +71,7 @@ public class Indexer {
         if (Files.isDirectory(path)) {
             int maxFile = 1;
             boolean hasWork = true;
+            boolean isWaiting = false;
             while (hasWork) {
                 Path currentMaxFile = path.resolve(String.format("%d.json", maxFile));
                 if (Files.isRegularFile(currentMaxFile) && Files.isRegularFile(path.resolve(String.format("%d.json", maxFile+1)))) {
@@ -82,8 +83,11 @@ public class Indexer {
                         System.err.println(e.toString());
                     }
                     maxFile++;
+                    isWaiting = false;
                 } else {
                     try {
+                        if (!isWaiting) System.out.println("Waiting for file " + (maxFile + 1));
+                        isWaiting = true;
                         Thread.sleep(5000);
                     } catch (InterruptedException e) {
                         System.err.println("Interrupted; exiting.");
