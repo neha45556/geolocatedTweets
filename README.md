@@ -2,7 +2,7 @@
 
 Prepared by: Daniel Ma (dma012@ucr.edu), Jeremy Taraba (jtara006@ucr.edu), Neha Gupta (ngupt009@ucr.edu)
 
-## Part A
+## Part A: Build a Web Crawler for edu pages, or a geotagged Twitter post collector
 
 ## Collaboration Details
 
@@ -102,3 +102,8 @@ the southwest coordinates specified first.
 [cap3]: https://github.com/neha45556/geolocatedTweets/raw/master/images/3.png
 [cap4]: https://github.com/neha45556/geolocatedTweets/raw/master/images/4.png
 [cap5]: https://github.com/neha45556/geolocatedTweets/raw/master/images/5.png
+
+
+
+## Part B: Build index and Web-based search interface
+
