@@ -10,6 +10,12 @@ Prepared by: Daniel Ma (dma012@ucr.edu), Jeremy Taraba (jtara006@ucr.edu), Neha 
 * Neha: Twitter API setup and abstraction, creating files and output data, Memory Management
 * Jeremy: Continuing Twitter API functionality, folder size and file size management, creating files
 
+## Collaboration Details PART B
+
+* Daniel: JSON data formatting, URL crawling, concurrency issues.
+* Neha: Lucene processing, website development, document relevance analysis
+* Jeremy: Lucene processing, server development, document relevance analysis
+
 ## Overview
 
 The Twitter Engine is built on the Tweepy library for Python 3. It collects Tweets
