@@ -86,7 +86,10 @@ public class Indexer {
                     isWaiting = false;
                 } else {
                     try {
-                        if (!isWaiting) System.out.println("Waiting for file " + (maxFile + 1));
+                        if (!isWaiting) {
+                            System.out.println("Waiting for file " + (maxFile + 1));
+                            writer.commit();
+                        }
                         isWaiting = true;
                         Thread.sleep(5000);
                     } catch (InterruptedException e) {
