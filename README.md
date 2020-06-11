@@ -157,5 +157,5 @@ Using Apache we were able to launch a working application with server at http://
 
 ## Screenshots
 
-[cap6]:https://github.com/neha45556/geolocatedTweets/raw/master/images/6.png
-[cap7]:https://github.com/neha45556/geolocatedTweets/raw/master/images/7.png
+https://github.com/neha45556/geolocatedTweets/raw/master/images/6.png
+https://github.com/neha45556/geolocatedTweets/raw/master/images/7.png
