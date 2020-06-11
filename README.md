@@ -12,9 +12,9 @@ Prepared by: Daniel Ma (dma012@ucr.edu), Jeremy Taraba (jtara006@ucr.edu), Neha 
 
 ## Collaboration Details PART B
 
-* Daniel: JSON data formatting, URL crawling, concurrency issues.
+* Daniel: Lucene insertion, server backend development
 * Neha: Lucene processing, website development, document relevance analysis
-* Jeremy: Lucene processing, server development, document relevance analysis
+* Jeremy: Lucene processing, server backend development, document relevance analysis
 
 ## Overview
 
