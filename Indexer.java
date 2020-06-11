@@ -69,18 +69,27 @@ public class Indexer {
 
     public static void indexEntries(IndexWriter writer, Path path) throws IOException {
         if (Files.isDirectory(path)) {
-            Files.walkFileTree(path, new SimpleFileVisitor<Path>() {
-                @Override
-                public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
+            int maxFile = 1;
+            boolean hasWork = true;
+            while (hasWork) {
+                Path currentMaxFile = path.resolve(String.format("%d.json", maxFile));
+                if (Files.isRegularFile(currentMaxFile) && Files.isRegularFile(path.resolve(String.format("%d.json", maxFile+1)))) {
                     try {
-                        InputStream in = Files.newInputStream(file);
+                        InputStream in = Files.newInputStream(currentMaxFile);
                         readJsonStream(in, writer);
                     } catch (Exception e) {
                         System.err.println(e.toString());
                     }
-                    return FileVisitResult.CONTINUE;
+                    maxFile++;
+                } else {
+                    try {
+                        Thread.sleep(5000);
+                    } catch (InterruptedException e) {
+                        System.err.println("Interrupted; exiting.");
+                        hasWork = false;
+                    }
                 }
-            });
+            }
         }
     }
 
