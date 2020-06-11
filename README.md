@@ -113,5 +113,5 @@ the southwest coordinates specified first.
 
 ## Part B: Build index and Web-based search interface
 
-
+https://docs.google.com/document/d/1r3yl8FAOVixQqswE_RzJyr62EeVqfy-roSR06R5dUuQ/edit?usp=sharing
 
