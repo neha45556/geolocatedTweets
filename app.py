@@ -4,55 +4,15 @@
 
 from flask import Flask
 from flask_restful import Api, Resource, reqparse
+import json
 
 app = Flask(__name__)
 api = Api(app)
 
-
 # mock values, this will be filled with the index
-index_values = [
-    {
-        "user": "Nicholas",
-        "text": "random text in here"
-    },
-    {
-        "user": "Nicholas",
-        "text": "test more random text but with more words"
-    },
-    {
-        "user": "Jass",
-        "text": "test which has better rank with random words"
-    },
-    {
-        "user": "Nicholas",
-        "text": "random text in here"
-    },
-    {
-        "user": "Nicholas",
-        "text": "test more random text but with more words"
-    },
-    {
-        "user": "Jass",
-        "text": "test which has better rank with random words"
-    },
-      {
-        "user": "Nicholas",
-        "text": "random text in here"
-    },
-    {
-        "user": "Nicholas",
-        "text": "test more random text but with more words"
-    },
-    {
-        "user": "Jass",
-        "text": "test which has better rank with random words"
-    },
-       {
-        "user": "Jass",
-        "text": "test which has better rank with random words"
-    }
+with open('example.json') as f:
+    index_values = json.load(f)
 
-]
 
 class index(Resource):
 
@@ -63,14 +23,14 @@ class index(Resource):
     # ranking is based on vector space model using tf, probably do difference in minutes * .001
     def get(self, name):
         index_list = []
-        for index in index_values:
-            tweet_text = set(index["text"].lower().split(' '))
+        for i in range(len(index_values)):
+            tweet_text = set(index_values[i]["text"].split(' '))
             search_term = set(name.lower().split(' '))
           
-            if(search_term[0] == tweet_text[0]):
-                index_list.append(index)
+            if(search_term == tweet_text):
+                index_list.append(index_values[i])
 
-        if index_list:
+        if index_list:  
             # sort and return the top 10 based on ranking   
             return index_list, 200
 
