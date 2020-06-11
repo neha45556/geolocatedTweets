@@ -156,3 +156,6 @@ Run ./crawler.sh to procure the data from the tweets then compile the indexer wi
 Using Apache we were able to launch a working application with server at http://cubesphere.net:9999/hello/search
 
 ## Screenshots
+
+https://github.com/neha45556/geolocatedTweets/raw/master/images/6.png
+https://github.com/neha45556/geolocatedTweets/raw/master/images/7.png
