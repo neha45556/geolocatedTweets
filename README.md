@@ -154,4 +154,4 @@ Run ./crawler.sh to procure the data from the tweets then compile the indexer wi
 ## A web-application (e.g. Web Archive) 
 Using Apache we were able to launch a working application with server at http://cubesphere.net:9999/hello/search
 
-
+## Screenshots
