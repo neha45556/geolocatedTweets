@@ -1,6 +1,8 @@
-# CS172: Twitter Search Engine: Part A
+# CS172: Twitter Search Engine: Part A And Part B
 
 Prepared by: Daniel Ma (dma012@ucr.edu), Jeremy Taraba (jtara006@ucr.edu), Neha Gupta (ngupt009@ucr.edu)
+
+## Part A
 
 ## Collaboration Details
 
