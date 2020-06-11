@@ -113,5 +113,14 @@ the southwest coordinates specified first.
 
 ## Part B: Build index and Web-based search interface
 
-https://docs.google.com/document/d/1r3yl8FAOVixQqswE_RzJyr62EeVqfy-roSR06R5dUuQ/edit?usp=sharing
+
+
+## Build index using Lucene
+
+Using Lucene we create an app which parses the JSON objects of your big files form Part A and inserts them into Lucene. It handles  fields like username, text, followers, time, location, and so on.  We specifically used PyLucene in order to wrap Java Lucene and access its components from Python. 
+
+## Create a Web-based interface
+
+We created a web interface which has a simple text box that accepts query terms. These terms can be searched by pressing enter or clicking the search button which will then generate the top 10 indexes based on a vector space ranking model. 
+
 
