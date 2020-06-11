@@ -132,7 +132,7 @@ Used apache and Lucene as well as tested using a REST API server to rank and ret
 Using Lucene we parsed the incoming tweets based on Username, Tweet text, Links, URL, and Title.
 
 ## Search Algorithm 
-Vector space model with time relevance which decreases the score the more time that pass since the initial search.
+Vector space model with time relevance which decreases the score the more time that pass since the initial search.  We chose this ranking algorithm because it is fairly simple to implement and run on our system.
 
 
 ## Build Index Using Lucene
@@ -144,10 +144,11 @@ Using Lucene we create an app which parses the JSON objects of your big files fo
 We created a web interface which has a simple text box that accepts query terms. These terms can be searched by pressing enter or clicking the search button which will then generate the top 10 indexes based on a vector space ranking model. 
 
 ## Limitation of the System
+
 Some limitation are not taking into account the URL, links or location that was provided with the tweets from tweepy. We could have used these to either better rank the tweets or to geo locate the tweets. Also in the future we would like to add the functionality to only search tweets within a certain radius of the user’s location to provide more relevant information.
 
 
-## Instructions on how to deploy the system. 
+## Instructions on how to deploy the system
 Run ./crawler.sh to procure the data from the tweets then compile the indexer with `./compile_indexer.sh` and run it with `./run_indexer.sh`. This will store the index files in the `index` folder. 
     
     
