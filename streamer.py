@@ -126,7 +126,10 @@ class TweetData:
 			entry = self._unparsed_data.get()
 			# Parse for URLs here
 			for link in entry['links']:
-				page_title = crawl_url(link['url'])
+				try:
+					page_title = crawl_url(link['url'])
+				except KeyError:
+					continue;
 				if page_title:
 					link['title'] = page_title
 			with self._parsed_data_lock:
@@ -156,7 +159,8 @@ class MyStreamListener(tweepy.StreamListener):
 			"user" : tweet.user.name or '',
 			"text" : tweet.text or '',
 			"links" : [{'url' : url['expanded_url'], 'title' : None} for url in tweet.entities['urls']],
-			"location" : dict(tweet.coordinates or {})
+			"location" : dict(tweet.coordinates or {}),
+			"datetime" : str(tweet.created_at or '')
 			})
 		return True
 
